@@ -23,12 +23,13 @@ public class JwtUserDetailsService implements UserDetailsService {
 	private UserRepository userRepository;
 
 	
+	//fetching user as per user in request header and 
 	@Override
     @Transactional
     public UserDetails loadUserByUsername(String username)
             throws UsernameNotFoundException {
 		System.out.println("loadUserByUsername started");
-        // Let people login with name
+       
         User user =  userRepository.findByUsername(username);
         System.out.println("user " + user.getUsername());
         System.out.println("user " + user.getPassword());
@@ -40,14 +41,6 @@ public class JwtUserDetailsService implements UserDetailsService {
         return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), Collections.emptyList());
     }
 
-    // This method is used by JWTAuthenticationFilter
- /*   @Transactional
-    public UserDetails loadUserById(Long id) {
-        User user = userRepository.findById(id).orElseThrow(
-            () -> new UsernameNotFoundException("User not found with id : " + id)
-        );
-
-        return UserPrincipal.create(user);
-    }*/
+    
 }
 

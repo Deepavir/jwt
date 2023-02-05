@@ -40,35 +40,15 @@ import com.example.springsecurity.service.JwtUserDetailsService;
 	    	System.out.println("authenticationManagerBean started");
 	 	   return configuration.getAuthenticationManager();
 	 	   }
-	    /*@Bean
-	    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-	        auth.userDetailsService(JwtUserDetailsService)
-	                .passwordEncoder(passwordEncoder());
-	    }*/
-	    @Bean
-	    public DaoAuthenticationProvider daoAuthenticationprovider() {
-	    	System.out.println("daoAuthenticationprovider started");
-	    	DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-	    	provider.setUserDetailsService(JwtUserDetailsService);
-	    	provider.setPasswordEncoder(passwordEncoder());
-	    	return provider;
-	    }
+	   
+	
 	    @Bean
 	    public JwtAuthenticationFilters jwtAuthenticationFilter(){
 	    	System.out.println("jwtAuthenticationFilter started");
 	        return  new JwtAuthenticationFilters();
 	    }
 	   
-	    @Bean
-	    public DaoAuthenticationProvider authenticationProvider() {
-	    	System.out.println("authenticationProvider started");
-	        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-	         
-	        authProvider.setUserDetailsService(JwtUserDetailsService);
-	        authProvider.setPasswordEncoder(passwordEncoder());
-	     
-	        return authProvider;
-	    }
+	
 	    @Bean
 	    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 	    	System.out.println("filterChain started");
@@ -80,7 +60,6 @@ import com.example.springsecurity.service.JwtUserDetailsService;
 	          .and()
 	          .exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint);
 	      
-	     http.authenticationProvider(daoAuthenticationprovider());
 
 	      http.addFilterBefore(JwtAuthenticationFilters, UsernamePasswordAuthenticationFilter.class);
 	      

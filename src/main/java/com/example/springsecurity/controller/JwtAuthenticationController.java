@@ -19,6 +19,7 @@ import com.example.springsecurity.Entity.JwtRequest;
 import com.example.springsecurity.Entity.JwtResponse;
 import com.example.springsecurity.Entity.User;
 import com.example.springsecurity.service.JwtUserDetailsService;
+
 @RestController
 public class JwtAuthenticationController {
 
@@ -34,29 +35,33 @@ public class JwtAuthenticationController {
 	@PostMapping("/authenticate")
 	public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
 		System.out.println("createAuthenticationToken started");
-		authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
+		try {
+			// authenticate username and password and than only will generate the token
+			System.out.println("authentication manager started");
+			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+					authenticationRequest.getUsername(), authenticationRequest.getPassword()));
+		} catch (DisabledException e) {
+			throw new Exception("USER_DISABLE", e);
+		} catch (BadCredentialsException e) {
+			throw new Exception("INVALID_CREDENTIALS", e);
+		}
+         UserDetails userdetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+		final String token = jwtTokenUtil.generateToken(userdetails);
 
-		final UserDetails userDetails = userDetailsService
-				.loadUserByUsername(authenticationRequest.getUsername());
-
-		System.out.println("userDetails " + userDetails);
-		
-		final String token = jwtTokenUtil.generateToken(userDetails);
-		
 		System.out.println("token " + token);
 		JwtResponse jwtResponse = new JwtResponse();
 		jwtResponse.setToken(token);
 		return ResponseEntity.ok(jwtResponse);
 	}
 
-	private void authenticate(String username, String password) throws Exception {
-		System.out.println("authenticate started");
-		try {
-			authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
-		} catch (DisabledException e) {
-			throw new Exception("USER_DISABLED", e);
-		} catch (BadCredentialsException e) {
-			throw new Exception("INVALID_CREDENTIALS", e);
-		}
-	}
+	/*
+	 * private void authenticate(String username, String password) throws Exception
+	 * { System.out.println("authenticate started"); try { //authenticate username
+	 * and password and than only will generate the token
+	 * authenticationManager.authenticate(new
+	 * UsernamePasswordAuthenticationToken(username, password)); } catch
+	 * (DisabledException e) { throw new Exception("USER_DISABLE", e); } catch
+	 * (BadCredentialsException e) { throw new Exception("INVALID_CREDENTIALS", e);
+	 * } }
+	 */
 }
